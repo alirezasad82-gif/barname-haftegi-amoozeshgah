@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#12233f" />
+  <title>برنامه هفتگی آموزشگاه</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">آ</div>
+        <div>
+          <p class="eyebrow">مدیریت هوشمند برنامه‌ها</p>
+          <h1>آموزشگاه فنی حرفه‌ای آتیه</h1>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="btn btn-light" id="printBtn" type="button"><span>⇩</span> خروجی هفتگی PDF</button>
+        <button class="btn btn-primary" id="adminBtn" type="button">ورود مدیر</button>
+        <button class="btn btn-light is-hidden" id="logoutBtn" type="button">خروج مدیر</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero-grid">
+        <div class="hero-copy">
+          <div class="status-pill"><span class="status-dot"></span> برنامه این هفته</div>
+          <h2>برنامه هفتگی، واضح و یک‌جا</h2>
+          <p>زمان‌بندی چهار کلاس آموزشگاه را واضح و بدون تداخل ببینید. برای مشاهده جزئیات هر برنامه روی کارت آن کلیک کنید.</p>
+          <div class="hero-meta"><span>ساعت فعالیت: ۰۸:۰۰ تا ۲۲:۰۰</span><span class="meta-separator">•</span><span>حداقل فاصله: ۱۵ دقیقه</span></div>
+        </div>
+        <div class="quick-stats">
+          <div class="stat-card"><span class="stat-icon blue">▦</span><div><strong id="eventCount">۰</strong><small>برنامه ثبت‌شده</small></div></div>
+          <div class="stat-card"><span class="stat-icon orange">◷</span><div><strong>۴</strong><small>کلاس فعال</small></div></div>
+          <div class="stat-card"><span class="stat-icon green">↻</span><div><strong id="repeatCount">۰</strong><small>برنامه تکرارشونده</small></div></div>
+        </div>
+      </section>
+
+      <section class="calendar-panel">
+        <div class="calendar-toolbar">
+          <div>
+            <p class="section-kicker">تقویم زمان‌بندی</p>
+            <h3 id="weekTitle">هفته جاری</h3>
+          </div>
+          <div class="toolbar-actions">
+            <button class="icon-btn" id="prevWeek" title="هفته قبل" type="button">→</button>
+            <button class="today-btn" id="todayBtn" type="button">امروز</button>
+            <button class="icon-btn" id="nextWeek" title="هفته بعد" type="button">←</button>
+          </div>
+        </div>
+        <div class="calendar-note"><span class="note-icon">i</span><span id="connectionStatus">در حال دریافت برنامه…</span></div>
+        <div class="legend" aria-label="راهنمای رنگ‌ها">
+          <span><i class="legend-dot violet"></i>کلاس‌های آموزشی</span>
+          <span><i class="legend-dot teal"></i>دوره‌های مهارتی</span>
+          <span><i class="legend-dot amber"></i>اجاره کلاس</span>
+          <span><i class="legend-dot rose"></i>جلسه ویژه</span>
+        </div>
+        <nav class="day-tabs" id="dayTabs" aria-label="انتخاب روز برای نمایش"></nav>
+        <div class="schedule-heading" aria-hidden="true"><span>روز و تاریخ</span><span>کلاس ۱</span><span>کلاس ۲</span><span>کلاس ۳</span><span>کلاس ۴</span></div>
+        <div id="schedule" class="schedule" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer class="footer"><span>آموزشگاه فنی حرفه‌ای آتیه</span><span>•</span><span>نمایش برنامه هفتگی</span></footer>
+  </div>
+
+  <div class="modal-backdrop" id="eventModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" data-close="eventModal" type="button">×</button>
+      <div class="modal-accent" id="detailAccent"></div>
+      <p class="section-kicker">جزئیات برنامه</p>
+      <h3 id="modalTitle">عنوان برنامه</h3>
+      <div id="modalBody" class="detail-grid"></div>
+      <div class="modal-footer"><button class="btn btn-light" data-close="eventModal" type="button">بستن</button><button class="btn btn-primary is-hidden" id="editBtn" type="button">ویرایش برنامه</button><button class="btn btn-danger is-hidden" id="deleteBtn" type="button">حذف برنامه</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="adminModal" aria-hidden="true">
+    <div class="modal modal-large" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+      <button class="modal-close" data-close="adminModal" type="button">×</button>
+      <div class="form-heading"><div class="form-icon">＋</div><div><p class="section-kicker">پنل مدیریت</p><h3 id="adminTitle">افزودن برنامه جدید</h3></div></div>
+      <form id="eventForm">
+        <div class="form-grid">
+          <label>عنوان کلاس / دوره<input name="title" required placeholder="مثلاً طراحی سایت مقدماتی" /></label>
+          <label>نام مدرس یا اجاره‌دهنده<input name="teacher" required placeholder="نام و نام خانوادگی" /></label>
+          <label>کلاس آموزشگاه<select name="room" required><option value="1">کلاس ۱</option><option value="2">کلاس ۲</option><option value="3">کلاس ۳</option><option value="4">کلاس ۴</option></select></label>
+          <label>شماره تماس <span class="optional">(اختیاری)</span><input name="phone" inputmode="tel" placeholder="۰۹۱۲..." /></label>
+        </div>
+
+        <fieldset class="field-group"><legend>روزهای برگزاری <span class="optional">(انتخاب چند روز ممکن است)</span></legend><div class="day-checks" id="dayChecks"></div></fieldset>
+
+        <div class="form-grid time-grid">
+          <label>ساعت شروع<input name="start" type="time" value="08:00" required /></label>
+          <label>ساعت پایان<input name="end" type="time" value="10:00" required /></label>
+          <label>رنگ برنامه<select name="color"><option value="violet">بنفش · آموزشی</option><option value="teal">سبزآبی · مهارتی</option><option value="amber">نارنجی · اجاره کلاس</option><option value="rose">صورتی · جلسه ویژه</option></select></label>
+        </div>
+
+        <fieldset class="field-group repeat-group"><legend>تکرار هفتگی</legend><label class="switch-row"><input id="repeatWeekly" name="repeatWeekly" type="checkbox" /><span class="switch"></span><span>این برنامه هر هفته تکرار شود</span></label><div id="repeatOptions" class="repeat-options is-hidden"><label class="radio-row"><input type="radio" name="repeatMode" value="forever" checked /> فقط تیک بزنم و بدون پایان ادامه داشته باشد</label><label class="radio-row"><input type="radio" name="repeatMode" value="range" /> از تاریخ شروع تا تاریخ پایان مشخص</label><div class="range-fields"><label>شروع تکرار<input name="repeatStart" type="date" /></label><label>پایان تکرار<input name="repeatEnd" type="date" /></label></div></div></fieldset>
+
+        <div class="form-grid optional-grid"><label>هفته برنامه غیرتکراری <span class="optional">(یک تاریخ از هفته موردنظر)</span><input name="date" type="date" /></label><label>قیمت اجاره <span class="optional">(اختیاری)</span><input name="price" inputmode="numeric" placeholder="مثلاً ۵۰۰٬۰۰۰ تومان" /></label></div>
+        <label class="full-label">توضیحات <span class="optional">(هر نکته‌ای که لازم است)</span><textarea name="description" rows="3" placeholder="توضیحات تکمیلی، تجهیزات مورد نیاز یا نکات هماهنگی..."></textarea></label>
+        <div class="form-footer"><span class="form-hint">فاصله حداقل ۱۵ دقیقه‌ای بین دو برنامه یک کلاس بررسی می‌شود.</span><div><button class="btn btn-light" data-close="adminModal" type="button">انصراف</button><button class="btn btn-primary" type="submit">ثبت برنامه</button></div></div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="loginModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+      <button class="modal-close" data-close="loginModal" type="button" aria-label="بستن">×</button>
+      <p class="section-kicker">دسترسی مدیریت</p><h3 id="loginTitle">ورود مدیر آموزشگاه</h3>
+      <p class="login-intro">بازدیدکنندگان فقط برنامه را می‌بینند. ثبت، ویرایش و حذف برنامه به ورود مدیر نیاز دارد.</p>
+      <form id="loginForm"><div class="form-grid login-fields">
+        <label>نام کاربری<input name="username" required autocomplete="username" dir="ltr" /></label>
+        <label>رمز عبور<input name="password" type="password" required autocomplete="current-password" dir="ltr" /></label>
+      </div><p id="loginError" role="alert"></p><button class="btn btn-primary login-submit" type="submit">ورود</button></form>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="deleteModal" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle"><h3 id="deleteTitle">حذف این برنامه؟</h3><p class="login-intro">تمام روزهای این برنامه و تکرارهای بعدی آن حذف می‌شوند.</p><div class="modal-footer"><button class="btn btn-light" data-close="deleteModal" type="button">انصراف</button><button class="btn btn-danger" id="confirmDeleteBtn" type="button">حذف برنامه</button></div></div></div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="scheduler.js"></script>
+  <script src="demo-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
